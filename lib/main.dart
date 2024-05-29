@@ -2,13 +2,16 @@ import 'package:fault_connect/Pages/HomePage/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'Pages/SplashScreen/splash_screen.dart';
 import 'firebase_options.dart';
 
 
 
-void main() {
-  runApp(const MyApp());
-}
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform
+  );}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -19,12 +22,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
 
-      home:  HomePage(),
+      home:  SplashScreen(),
     );
   }
 }
-// void main() async{
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(
-//       options: DefaultFirebaseOptions.currentPlatform
-//   );}
+
