@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "656282574292",
+    "project_id": "fault-connect-app",
+    "storage_bucket": "fault-connect-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656282574292:android:6e4d90d38e553802418a41",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2NsaR4oyK7NhaPKnVgOzsYaL9tzTRivg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656282574292:android:6a922e205d9209d5418a41",
+        "android_client_info": {
+          "package_name": "com.example.fault_connect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2NsaR4oyK7NhaPKnVgOzsYaL9tzTRivg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656282574292:android:46fdfc5fa8fe8e75418a41",
+        "android_client_info": {
+          "package_name": "com.example.fault_connect_mobile1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2NsaR4oyK7NhaPKnVgOzsYaL9tzTRivg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
