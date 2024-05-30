@@ -102,153 +102,149 @@ class _HomePageState extends State<HomePage> {
 
 
 
-  Future<void> _captureImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
 
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = pickedFile;
-      });
-    } else {
-      // User canceled the image picker
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('No image selected'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
+  final String? path = pickImage(ImageSource.gallery);
+  Future<String?> _captureImage(ImageSource source) async{
+    try{
+      final image = await ImagePicker().pickImage(source: source);
+      if(image == null) return null;
+      return image.path;
+    }on PlatformException catch (e){
+      print("Failed to pick Image $e");
+    }}
+
+
+
+    void signOut(){
+
+      FirebaseAuth.instance.signOut();
     }
-  }
-  void signOut(){
 
-    FirebaseAuth.instance.signOut();
-  }
-
-  // Future<void> addProduct() async {
-  //   try {
-  //     FormData formData = FormData();
-  //     Map<String, dynamic> productDetails = {
-  //       'details': addressTextController.text,
-  //       'faultCategories':  faultCategoryController.text,
-  //       'status': statusController.text,
-  //       'recipient':  recipientTextController.text,
-  //       'longitude': _latitudeController.text,
-  //       'latitude': _longitudeController.text,
-  //       'location': _locationController.text,
-  //     };
-  //
-  //     File compressedFile = await compressFile(File(file!.path));
-  //     int fileSizeInBytes = await compressedFile.length();
-  //     double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-  //
-  //     print('FILE SIZE IS####### ${fileSizeInMB.toStringAsFixed(2)} MB');
-  //     formData.files.add(MapEntry(
-  //         "productImage",
-  //         await MultipartFile.fromFile(
-  //           compressedFile!.path,
-  //           filename: '${nameInput.value.text}.webp',
-  //         )));
-  //     productDetails.forEach((key, value) {
-  //       formData.fields.add(MapEntry(key, value.toString()));
-  //     });
-  //     Response productResponse = await Dio(productOptions).post(
-  //       'product/create',
-  //       data: formData,
-  //     );
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //
-  //     if (productResponse.data['success'] == false) {
-  //       await showError(
-  //         context,
-  //         productResponse.data['message'],
-  //       );
-  //       return;
-  //     }
-  //     await showSuccessMessage(
-  //         context, "Product uploaded successful!", const MyStore());
-  //   } catch (e) {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //     if (e is DioError) {
-  //       if (e.type == DioErrorType.connectTimeout) {
-  //         await showError(context,
-  //             'Connection Failed. Please check you internet connection!!');
-  //       } else if (e.type == DioErrorType.receiveTimeout) {
-  //         await showError(context,
-  //             'Connection Failed. Please check you internet connection!!');
-  //       } else if (e.type == DioErrorType.connectTimeout) {
-  //         await showError(
-  //             context,
-  //             'Server issue' + e.response?.data["error"] ??
-  //                 'Something went wrong!!');
-  //       } else {
-  //         await showError(
-  //             context,
-  //             'Server issue' + e.response?.data["error"] ??
-  //                 'Something went wrong!!');
-  //       }
-  //     } else {
-  //       await showError(context, 'Something went wrong!!');
-  //     }
-  //   }
-  // }
+    // Future<void> addProduct() async {
+    //   try {
+    //     FormData formData = FormData();
+    //     Map<String, dynamic> productDetails = {
+    //       'details': addressTextController.text,
+    //       'faultCategories':  faultCategoryController.text,
+    //       'status': statusController.text,
+    //       'recipient':  recipientTextController.text,
+    //       'longitude': _latitudeController.text,
+    //       'latitude': _longitudeController.text,
+    //       'location': _locationController.text,
+    //     };
+    //
+    //     File compressedFile = await compressFile(File(file!.path));
+    //     int fileSizeInBytes = await compressedFile.length();
+    //     double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
+    //
+    //     print('FILE SIZE IS####### ${fileSizeInMB.toStringAsFixed(2)} MB');
+    //     formData.files.add(MapEntry(
+    //         "productImage",
+    //         await MultipartFile.fromFile(
+    //           compressedFile!.path,
+    //           filename: '${nameInput.value.text}.webp',
+    //         )));
+    //     productDetails.forEach((key, value) {
+    //       formData.fields.add(MapEntry(key, value.toString()));
+    //     });
+    //     Response productResponse = await Dio(productOptions).post(
+    //       'product/create',
+    //       data: formData,
+    //     );
+    //     setState(() {
+    //       _isLoading = false;
+    //     });
+    //
+    //     if (productResponse.data['success'] == false) {
+    //       await showError(
+    //         context,
+    //         productResponse.data['message'],
+    //       );
+    //       return;
+    //     }
+    //     await showSuccessMessage(
+    //         context, "Product uploaded successful!", const MyStore());
+    //   } catch (e) {
+    //     setState(() {
+    //       _isLoading = false;
+    //     });
+    //     if (e is DioError) {
+    //       if (e.type == DioErrorType.connectTimeout) {
+    //         await showError(context,
+    //             'Connection Failed. Please check you internet connection!!');
+    //       } else if (e.type == DioErrorType.receiveTimeout) {
+    //         await showError(context,
+    //             'Connection Failed. Please check you internet connection!!');
+    //       } else if (e.type == DioErrorType.connectTimeout) {
+    //         await showError(
+    //             context,
+    //             'Server issue' + e.response?.data["error"] ??
+    //                 'Something went wrong!!');
+    //       } else {
+    //         await showError(
+    //             context,
+    //             'Server issue' + e.response?.data["error"] ??
+    //                 'Something went wrong!!');
+    //       }
+    //     } else {
+    //       await showError(context, 'Something went wrong!!');
+    //     }
+    //   }
+    // }
 
 
-  Future<void> _sendReport() async {
-    try {
-      var request = http.MultipartRequest('POST', Uri.parse('http://localhost:8085/file/create'));
-      request.fields.addAll({
-        'details': addressTextController.text,
-        'faultCategories': faultCategoryController.text,
-        'status': statusController.text,
-        'recipient': recipientTextController.text,
-        'longitude': latitudeController.text,
-        'latitude': longitudeController.text,
-        'location': _locationController.text,
-      });
 
-      http.StreamedResponse response = await request.send();
+    Future<void> _sendReport() async {
+      try {
+        var request = http.MultipartRequest('POST', Uri.parse('http://localhost:8085/file/create'));
+        request.fields.addAll({
+          'details': addressTextController.text,
+          'faultCategories': faultCategoryController.text,
+          'status': statusController.text,
+          'recipient': recipientTextController.text,
+          'longitude': latitudeController.text,
+          'latitude': longitudeController.text,
+          'location': _locationController.text,
+        });
+        request.files.add(await http.MultipartFile.fromPath('image',path!));
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print(response.statusCode);
-        print(response.toString());
+        http.StreamedResponse response = await request.send();
 
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          print(response.statusCode);
+          print(response.toString());
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Report successfully Sent'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        } else {
+          print(response.statusCode);
+          print(response.reasonPhrase);
+          print(response.statusCode);
+          print(response.toString());
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to Send Report: ${response.reasonPhrase}'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } catch (e) {
+        print("http error");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Report successfully Sent'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 3),
-          ),
-        );
-      } else {
-        print(response.statusCode);
-        print(response.reasonPhrase);
-        print(response.statusCode);
-        print(response.toString());
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to Send Report: ${response.reasonPhrase}'),
+            content: Text('Exception occurred: $e'),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 3),
           ),
         );
       }
-    } catch (e) {
-      print("http error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Exception occurred: $e'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
     }
-  }
 
 
 
