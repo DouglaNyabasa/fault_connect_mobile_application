@@ -20,27 +20,23 @@ class _ReportPageState extends State<ReportPage> {
   @override
   void initState() {
     super.initState();
-    fetchReports();
+    getAllFaults();
   }
-
-  Future<void> fetchReports() async {
-    // Replace the URL with your actual reports API endpoint
-    final response = await http.get(Uri.parse('https://your-api.com/reports'));
-    // or use Dio:
-    // final response = await Dio().get('https://your-api.com/reports');
+  static Future<List<ReportModel>> getAllFaults() async {
+    final request = http.Request('GET', Uri.parse('http://localhost:8085/faults/getAll'));
+    http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        reports = (data as List)
-            .map((item) => ReportModel.fromJson(item as Map<String, dynamic>))
-            .toList();
-      });
+      final responseBody = await response.stream.bytesToString();
+      final List<dynamic> faultsJson = jsonDecode(responseBody);
+
+      return faultsJson.map((json) => ReportModel.fromJson(json)).toList();
     } else {
-      // Handle error
-      print('Error fetching reports: ${response.statusCode}');
+      throw Exception('Failed to fetch faults: ${response.reasonPhrase}');
     }
   }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -27,26 +28,142 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  XFile? _imageFile;
-  String? _imagePath;
 
   // final user = FirebaseAuth.instance.currentUser!;
-  File? image;
-  String _selectedCompany = 'Municipality';
-  String _selectedCategory = 'Burst Pipe';
+
+  String recipientController = 'Municipality';
+  String faultCategoryController = 'Burst Pipe';
   String currentAddress = 'My Address';
   Position? currentPosition ;
-  final faultCategoryController = TextEditingController();
   final latitudeController = TextEditingController();
   final longitudeController = TextEditingController();
-  final _locationController = TextEditingController();
+  final detailsController = TextEditingController();
   final statusController = TextEditingController();
   final locationController = TextEditingController();
   final phoneController = TextEditingController();
   final addressTextController = TextEditingController();
-  final recipientTextController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  File?  _imageFile;
+
+  void _pickImageBase64() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    if (image == null) return;
+
+    Uint8List imagebyte = await image!.readAsBytes();
+    String _base64 = base64.encode(imagebyte);
+    print(_base64);
+    final imagetemppath = File(image.path);
+    setState(() {
+      this._imageFile = imagetemppath;
+    });
+    print(imagetemppath);
+  }
+  // Future<void> _sendReport() async {
+  //   try {
+  //     final request = http.MultipartRequest('POST', Uri.parse('http://localhost:8085/file/create'));
+  //
+  //     request.fields.addAll({
+  //       'details': detailsController.text,
+  //       'faultCategories': faultCategoryController.toString(),
+  //       'status': statusController.text,
+  //       'recipient': recipientController.toString(),
+  //       'longitude': longitudeController.text,
+  //       'latitude': latitudeController.text,
+  //     });
+  //
+  //     if (_imageFile != null) {
+  //       final imageBytes = await _imageFile!.readAsBytes();
+  //       final imageBase64 = base64Encode(imageBytes);
+  //       request.fields['image'] = imageBase64;
+  //     }
+  //
+  //     final streamedResponse = await request.send();
+  //     final response = await http.Response.fromStream(streamedResponse);
+  //
+  //     if (response.statusCode == 200) {
+  //       print(response.body);
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('Report sent successfully'),
+  //           backgroundColor: Colors.green,
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //     } else {
+  //       print('Error: ${response.statusCode} - ${response.reasonPhrase}');
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('Error sending report: ${response.statusCode} - ${response.reasonPhrase}'),
+  //           backgroundColor: Colors.red,
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //     }
+  //   } catch (e, stackTrace) {
+  //     print('Error: $e');
+  //     print('Stacktrace: $stackTrace');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Error: $e'),
+  //         backgroundColor: Colors.red,
+  //         duration: Duration(seconds: 3),
+  //       ),
+  //     );
+  //   }
+  // }
+  Future<void> _sendReport() async {
+    try {
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('http://localhost:8085/file/create'));
+      request.fields.addAll({
+        'details': detailsController.text,
+        'faultCategories': faultCategoryController.toString(),
+        'status': statusController.text,
+        'recipient': recipientController.toString(),
+        'longitude': longitudeController.text,
+        'latitude': latitudeController.text,
+      });
+      if (_imageFile != null) {
+        final imageBytes = await _imageFile!.readAsBytes();
+        final imageBase64 = base64Encode(imageBytes);
+        request.fields['image'] = imageBase64;
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
 
+      if (response.statusCode == 200) {
+        print(response.statusCode);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Account created successfully'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else {
+        print(response.statusCode);
+        print(response.reasonPhrase);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create account'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
 
   Future<Position>_determinePosition() async{
     bool serviceEnabled;
@@ -97,21 +214,14 @@ class _HomePageState extends State<HomePage> {
 
   ];
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
-  final _picker = ImagePicker();
 
 
 
 
 
-  final String? path = pickImage(ImageSource.gallery);
-  Future<String?> _captureImage(ImageSource source) async{
-    try{
-      final image = await ImagePicker().pickImage(source: source);
-      if(image == null) return null;
-      return image.path;
-    }on PlatformException catch (e){
-      print("Failed to pick Image $e");
-    }}
+
+
+
 
 
 
@@ -120,131 +230,8 @@ class _HomePageState extends State<HomePage> {
       FirebaseAuth.instance.signOut();
     }
 
-    // Future<void> addProduct() async {
-    //   try {
-    //     FormData formData = FormData();
-    //     Map<String, dynamic> productDetails = {
-    //       'details': addressTextController.text,
-    //       'faultCategories':  faultCategoryController.text,
-    //       'status': statusController.text,
-    //       'recipient':  recipientTextController.text,
-    //       'longitude': _latitudeController.text,
-    //       'latitude': _longitudeController.text,
-    //       'location': _locationController.text,
-    //     };
-    //
-    //     File compressedFile = await compressFile(File(file!.path));
-    //     int fileSizeInBytes = await compressedFile.length();
-    //     double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-    //
-    //     print('FILE SIZE IS####### ${fileSizeInMB.toStringAsFixed(2)} MB');
-    //     formData.files.add(MapEntry(
-    //         "productImage",
-    //         await MultipartFile.fromFile(
-    //           compressedFile!.path,
-    //           filename: '${nameInput.value.text}.webp',
-    //         )));
-    //     productDetails.forEach((key, value) {
-    //       formData.fields.add(MapEntry(key, value.toString()));
-    //     });
-    //     Response productResponse = await Dio(productOptions).post(
-    //       'product/create',
-    //       data: formData,
-    //     );
-    //     setState(() {
-    //       _isLoading = false;
-    //     });
-    //
-    //     if (productResponse.data['success'] == false) {
-    //       await showError(
-    //         context,
-    //         productResponse.data['message'],
-    //       );
-    //       return;
-    //     }
-    //     await showSuccessMessage(
-    //         context, "Product uploaded successful!", const MyStore());
-    //   } catch (e) {
-    //     setState(() {
-    //       _isLoading = false;
-    //     });
-    //     if (e is DioError) {
-    //       if (e.type == DioErrorType.connectTimeout) {
-    //         await showError(context,
-    //             'Connection Failed. Please check you internet connection!!');
-    //       } else if (e.type == DioErrorType.receiveTimeout) {
-    //         await showError(context,
-    //             'Connection Failed. Please check you internet connection!!');
-    //       } else if (e.type == DioErrorType.connectTimeout) {
-    //         await showError(
-    //             context,
-    //             'Server issue' + e.response?.data["error"] ??
-    //                 'Something went wrong!!');
-    //       } else {
-    //         await showError(
-    //             context,
-    //             'Server issue' + e.response?.data["error"] ??
-    //                 'Something went wrong!!');
-    //       }
-    //     } else {
-    //       await showError(context, 'Something went wrong!!');
-    //     }
-    //   }
-    // }
 
 
-
-    Future<void> _sendReport() async {
-      try {
-        var request = http.MultipartRequest('POST', Uri.parse('http://localhost:8085/file/create'));
-        request.fields.addAll({
-          'details': addressTextController.text,
-          'faultCategories': faultCategoryController.text,
-          'status': statusController.text,
-          'recipient': recipientTextController.text,
-          'longitude': latitudeController.text,
-          'latitude': longitudeController.text,
-          'location': _locationController.text,
-        });
-        request.files.add(await http.MultipartFile.fromPath('image',path!));
-
-        http.StreamedResponse response = await request.send();
-
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          print(response.statusCode);
-          print(response.toString());
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Report successfully Sent'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        } else {
-          print(response.statusCode);
-          print(response.reasonPhrase);
-          print(response.statusCode);
-          print(response.toString());
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to Send Report: ${response.reasonPhrase}'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
-      } catch (e) {
-        print("http error");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Exception occurred: $e'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
-    }
 
 
 
@@ -371,13 +358,12 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                 _imageFile != null ?
-                  Image.file(
-                      File(_imageFile!.path),
-                      width: 350,height: 250,fit: BoxFit.cover,
-                  )
 
-                  :Icon(CupertinoIcons.photo,size: 200,),
+
+                  _imageFile == null ? Icon(CupertinoIcons.photo,size: 200,):
+                  Image.file
+                      (_imageFile!, width: 350,height: 250,fit: BoxFit.cover,),
+
                  //  const Text("Upload Fault Image",style: TextStyle(fontSize: 26,fontWeight: FontWeight.bold,color: Colors.black),),
                   const SizedBox(height: 14,),
                   ElevatedButton(
@@ -386,7 +372,9 @@ class _HomePageState extends State<HomePage> {
                         textStyle: TextStyle(fontSize: 20),
 
                       ),
-                      onPressed: ()=> _captureImage,
+                      onPressed: (){_pickImageBase64();},
+
+
                       child:  const Row(
                         children: [
                           Icon(CupertinoIcons.photo_camera, size: 28,),
@@ -509,7 +497,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 25,),
                   DropdownButtonFormField<String>(
-                    value: _selectedCategory,
+                    value: faultCategoryController,
                     decoration: InputDecoration(
                       labelText: 'Select Category',
                       hintStyle: TextStyle(
@@ -518,7 +506,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     onChanged: (newValue) {
                       setState(() {
-                        _selectedCategory = newValue!;
+                        faultCategoryController = newValue!;
                       });
                     },
                     items: _categories.map((category) {
@@ -531,7 +519,7 @@ class _HomePageState extends State<HomePage> {
 
                   SizedBox(height: 12,),
                   DropdownButtonFormField<String>(
-                    value: _selectedCompany,
+                    value: recipientController,
                     decoration: const InputDecoration(
                         labelText: 'Select Recipient',
                         hintStyle: TextStyle(
@@ -540,7 +528,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     onChanged: (newValue) {
                       setState(() {
-                        _selectedCompany = newValue!;
+                        recipientController = newValue!;
                       });
                     },
                     items: _stakeholder.map((category) {
@@ -577,10 +565,7 @@ class _HomePageState extends State<HomePage> {
                     MaterialButton(
                       minWidth: double.infinity,
                       height: 40,
-                      onPressed: (){
-                         _sendReport();
-
-                      },
+                      onPressed: ()=> _sendReport(),
                       color: AppColor.errorColor,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
