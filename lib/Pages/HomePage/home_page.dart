@@ -31,8 +31,8 @@ class _HomePageState extends State<HomePage> {
 
   // final user = FirebaseAuth.instance.currentUser!;
 
-  String recipientController = 'Municipality';
-  String faultCategoryController = 'Burst Pipe';
+  String recipientController = 'MUNICIPALITY';
+  String faultCategoryController = 'SEWAGE_BURST';
   String currentAddress = 'My Address';
   Position? currentPosition ;
   final latitudeController = TextEditingController();
@@ -114,12 +114,12 @@ class _HomePageState extends State<HomePage> {
   Future<void> _sendReport() async {
     try {
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://localhost:8085/file/create'));
+          'POST', Uri.parse('https://197.221.232.184:8085/file/create'));
       request.fields.addAll({
         'details': detailsController.text,
-        'faultCategories': faultCategoryController.toString(),
+        'faultCategories': faultCategoryController,
         'status': statusController.text,
-        'recipient': recipientController.toString(),
+        'recipient': recipientController,
         'longitude': longitudeController.text,
         'latitude': latitudeController.text,
       });
@@ -199,18 +199,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   final List<String> _stakeholder = [
-    'Municipality',
-    'ZETDC',
+    'MUNICIPALITY',
+    'ZESA',
 
 
   ];
   final List<String> _categories = [
-    'Burst Pipe',
-    'Potholes',
-    'Electrical Issues',
-    'Water leaks',
-    'Power outages',
-    'Sewage burst'
+    'SEWAGE_BURST',
+    'POTHOLES',
+    'OUTAGES',
+    'WATER_LEAK',
+    'POWER',
+
 
   ];
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();

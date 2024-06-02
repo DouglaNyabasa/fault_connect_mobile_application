@@ -1,34 +1,34 @@
-class ReportModel {
+class FaultModel {
   int? id;
   String? details;
   String? faultCategories;
   String? dateTime;
   String? status;
   String? image;
-  String? latitudeController;
-  String? longitudeController;
-  Null? recipient;
+  String? longitude;
+  String? latitude;
+  String? recipient;
 
-  ReportModel(
+  FaultModel(
       {this.id,
         this.details,
         this.faultCategories,
         this.dateTime,
         this.status,
         this.image,
-        this.latitudeController,
-        this.longitudeController,
+        this.longitude,
+        this.latitude,
         this.recipient});
 
-  ReportModel.fromJson(Map<String, dynamic> json) {
+  FaultModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     details = json['details'];
     faultCategories = json['faultCategories'];
     dateTime = json['dateTime'];
     status = json['status'];
     image = json['image'];
-    latitudeController = json['latitudeController'];
-    longitudeController = json['longitudeController'];
+    longitude = json['longitude'];
+    latitude = json['latitude'];
     recipient = json['recipient'];
   }
 
@@ -40,8 +40,8 @@ class ReportModel {
     data['dateTime'] = this.dateTime;
     data['status'] = this.status;
     data['image'] = this.image;
-    data['latitudeController'] = this.latitudeController;
-    data['longitudeController'] = this.longitudeController;
+    data['longitude'] = this.longitude;
+    data['latitude'] = this.latitude;
     data['recipient'] = this.recipient;
     return data;
   }

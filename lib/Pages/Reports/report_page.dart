@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:http/http.dart' as http;
 import '../../Models/report_model.dart';
@@ -15,26 +16,51 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  List<ReportModel> reports = [];
+  List<FaultModel> reports = [];
 
   @override
   void initState() {
     super.initState();
     getAllFaults();
   }
-  static Future<List<ReportModel>> getAllFaults() async {
-    final request = http.Request('GET', Uri.parse('http://localhost:8085/faults/getAll'));
+  static Future<List<FaultModel>> getAllFaults() async {
+    final request = http.Request('GET', Uri.parse('https://197.221.232.184:8085/faults/getAll'));
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
       final responseBody = await response.stream.bytesToString();
       final List<dynamic> faultsJson = jsonDecode(responseBody);
 
-      return faultsJson.map((json) => ReportModel.fromJson(json)).toList();
+      return faultsJson.map((json) => FaultModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch faults: ${response.reasonPhrase}');
     }
   }
+
+  final url = 'https://197.221.232.184:8085/faults/getAll';
+  var _postJson=[];
+
+  void fetchFaults() async{
+    try{
+      final response = await get(Uri.parse(url));
+      final jsonData = jsonDecode(response.body) as List;
+      setState(() {
+        _postJson = jsonData;
+      });
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+
+
 
 
   @override
@@ -49,20 +75,20 @@ class _ReportPageState extends State<ReportPage> {
         title:  Text("All Reports",style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 22,letterSpacing: 1,wordSpacing: 2),),
 
       ),
-      body: reports.isEmpty
+      body: _postJson.isEmpty
           ? Center(child: CircularProgressIndicator())
           : ListView.separated(
-        itemCount: reports.length,
+        itemCount: _postJson.length,
         itemBuilder: (context, index) {
-          final report = reports[index];
+          final report = _postJson[index];
           return ListTile(
             title: Text(report.details ?? ''),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                           Text('Fault Categories: ${report.faultCategories ?? ''}'),
-                          Text('location: ${report.latitudeController ?? ''}'),
-                          Text('location: ${report.longitudeController ?? ''}'),
+                          Text('location: ${report.latitude ?? ''}'),
+                          Text('location: ${report.longitude ?? ''}'),
                           Text('recipient: ${report.recipient ?? ''}'),
                           Text('Status: ${report.status ?? ''}'),
                           Text('Date/Time: ${report.dateTime ?? ''}'),
