@@ -14,24 +14,55 @@ class ActiveReportsPage extends StatefulWidget {
 
 class _ActiveReportsPageState extends State<ActiveReportsPage> {
   List<FaultModel> _reports = [];
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchReportData();
+    fetchReports();
   }
 
-  Future<void> _fetchReportData() async {
-    final response = await http.get(Uri.parse('https://api.example.com/reports'));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+  // CHANGE THE Uri TO THE IP ADDRESS OF YOUR COMPUTER
+  Future<void> fetchReports() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // 'http://10.160.1.201:8085/file/create'
+      final response = await http.get(Uri.parse('http://192.168.43.32:8085/faults/getAllFaults'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> reportData = jsonDecode(response.body);
+        print(response.statusCode);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Reports Fetched successfully'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+        setState(() {
+          _reports = reportData.map((json) => FaultModel.fromJson(json)).toList();
+        });
+      } else {
+        print(response.statusCode);
+        print(response.reasonPhrase);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to Fetch report'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error fetching reports: $e');
+    } finally {
       setState(() {
-        _reports = (data as List)
-            .map((reportData) => FaultModel.fromJson(reportData))
-            .toList();
+        isLoading = false;
       });
-    } else {
-      // Handle error
     }
   }
   @override
