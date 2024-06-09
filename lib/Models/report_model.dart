@@ -8,6 +8,7 @@ class FaultModel {
   String? longitude;
   String? latitude;
   String? recipient;
+  String? updatedStatus;
 
   FaultModel(
       {this.id,
@@ -18,7 +19,9 @@ class FaultModel {
         this.image,
         this.longitude,
         this.latitude,
-        this.recipient});
+        this.recipient,
+        this.updatedStatus,
+      });
 
   FaultModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -30,6 +33,7 @@ class FaultModel {
     longitude = json['longitude'];
     latitude = json['latitude'];
     recipient = json['recipient'];
+    updatedStatus= json['updatedStatus'];
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +47,7 @@ class FaultModel {
     data['longitude'] = this.longitude;
     data['latitude'] = this.latitude;
     data['recipient'] = this.recipient;
+    data['updatedStatus'] = this.updatedStatus;
     return data;
   }
 }

@@ -6,15 +6,15 @@ import 'Pages/SplashScreen/splash_screen.dart';
 import 'firebase_options.dart';
 
 
-void main() {
-  runApp(const MyApp());
-}
 
-// void main() async{
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(
-//       options: DefaultFirebaseOptions.currentPlatform
-//   );}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
 
-      home:  HomePage(),
+      home:  SplashScreen(),
     );
   }
 }
