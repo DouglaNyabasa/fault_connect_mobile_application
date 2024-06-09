@@ -552,6 +552,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:fault_connect/Pages/Authentication/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -563,6 +564,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import '../Authentication/auth_service.dart';
 import '../Reports/active_reports.dart';
 import '../Reports/report_page.dart';
 import '../common/drawer.dart';
@@ -578,6 +580,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  AuthService authService = AuthService();
+
   final user = FirebaseAuth.instance.currentUser!;
 
   String recipientController = 'MUNICIPALITY';
@@ -807,8 +811,32 @@ class _HomePageState extends State<HomePage> {
                       fontWeight: FontWeight.bold)),
             ),
             ListTile(
-              onTap: () {
-                signOut();
+              onTap: () async{
+                showDialog(
+                  barrierDismissible: false,
+                    context: context, 
+                    builder: (context){
+                      return AlertDialog(
+                        title: const Text("Logout"),
+                        content: const Text("Are you sure you to Logout?"),
+                        actions: [
+                          IconButton(
+                              onPressed: (){
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.cancel, color: Colors.red,)),
+                          IconButton(
+                              onPressed: () async{
+                               await authService.signOut();
+                               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=> const LoginPage()), (route)=> false);
+                               
+                              },
+                              icon: const Icon(Icons.done, color: Colors.green,)),
+                        ],
+                        
+                      );
+                      
+                    });
               },
               selectedColor: AppColor.gray60,
               selected: true,
@@ -945,7 +973,7 @@ class _HomePageState extends State<HomePage> {
                           SizedBox(
                             width: 14,
                           ),
-                          Text("Current Location")
+                          Text("Generate Current Location")
                         ],
                       )),
                   Padding(
