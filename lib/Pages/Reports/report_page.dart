@@ -32,7 +32,7 @@ class _ReportPageState extends State<ReportPage> {
 
     try {
       // 'http://10.160.1.201:8085/file/create'
-      final response = await http.get(Uri.parse('http://192.168.43.32:8085/faults/getAll'));
+      final response = await http.get(Uri.parse('http://192.168.43.32:8085/faults/getAllFaults'));
 
       if (response.statusCode == 200) {
         final List<dynamic> reportData = jsonDecode(response.body);
