@@ -23,19 +23,17 @@ class _ActiveReportsPageState extends State<ActiveReportsPage> {
   }
 
   // CHANGE THE Uri TO THE IP ADDRESS OF YOUR COMPUTER
+  // CHANGE TO YOUR IP ADDRESS HERE >> 'http://192.168.43.32:8085/faults/getAllFaults' ,REPLACE '192.168.43.32' WITH YOUR IP ADDRESS
   Future<void> fetchReports() async {
     setState(() {
       isLoading = true;
     });
-
     try {
       // 'http://10.160.1.201:8085/file/create'
       final response = await http.get(Uri.parse('http://192.168.43.32:8085/faults/getAllFaults'));
-
       if (response.statusCode == 200) {
         final List<dynamic> reportData = jsonDecode(response.body);
         print(response.statusCode);
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Reports Fetched successfully'),

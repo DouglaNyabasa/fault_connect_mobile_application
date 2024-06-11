@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:image_picker/image_picker.dart';
 import '../../Models/report_model.dart';
 
 
@@ -17,6 +18,8 @@ class ReportPage extends StatefulWidget {
 class _ReportPageState extends State<ReportPage> {
   List<FaultModel> reports = [];
   bool isLoading = false;
+  final _imagePicker = ImagePicker();
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -25,6 +28,7 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   // CHANGE THE Uri TO THE IP ADDRESS OF YOUR COMPUTER
+  // CHANGE TO YOUR IP ADDRESS HERE >> 'http://192.168.43.32:8085/faults/getAllFaults' ,REPLACE '192.168.43.32' WITH YOUR IP ADDRESS
   Future<void> fetchReports() async {
     setState(() {
       isLoading = true;
@@ -67,6 +71,14 @@ class _ReportPageState extends State<ReportPage> {
       });
     }
   }
+  Future<void> _getImage() async {
+    final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +112,16 @@ class _ReportPageState extends State<ReportPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (report.imageUrl != null)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.network(
+                            report.imageUrl!,
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       Text(
                         report.faultCategories ?? '',
                         style: TextStyle(
